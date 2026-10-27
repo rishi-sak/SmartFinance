@@ -65,4 +65,30 @@ class UserRepositoryTest {
         // Assert
         assertThat(result).isEmpty();
     }
+
+
+    @Test
+    void saveUser_rejectsDuplicateEmail() {
+        // Arrange: save the first user
+        User firstUser = new User(
+                "Rishi",
+                "rishi@example.com",
+                "encoded-password",
+                "USER"
+        );
+
+        userRepository.saveAndFlush(firstUser);
+
+        // Act + Assert: attempt to save the same email again
+        User duplicateUser = new User(
+                "Another User",
+                "rishi@example.com",
+                "another-encoded-password",
+                "USER"
+        );
+
+        assertThatThrownBy(() -> userRepository.saveAndFlush(duplicateUser))
+                .isInstanceOf(DataIntegrityViolationException.class);
+    }
+
 }
